@@ -34,7 +34,7 @@ public class HideSecretKeyInGitSpringBootApplication {
                 if (StringUtils.isEmpty(key))
                     return false;
                 String value = config.get(String.class, key);
-                return !StringUtils.isEmpty(value);
+                return StringUtils.isNotEmpty(value);
             }).forEach(key -> {
                 String value = config.get(String.class, key);
                 if (value.startsWith("$CIPHER$")) {
