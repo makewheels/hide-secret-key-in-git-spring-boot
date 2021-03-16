@@ -1,13 +1,15 @@
 package com.github.makewheels;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -84,10 +86,7 @@ public class RSAUtil {
      */
     public static PublicKey loadPublicKey(File privateKeyFile)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] keyBytes = Files.readAllBytes(Paths.get(privateKeyFile.getPath()));
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return keyFactory.generatePublic(spec);
+        return null;
     }
 
     /**
@@ -101,7 +100,13 @@ public class RSAUtil {
      */
     public static PrivateKey loadPrivateKey(File privateKeyFile)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] keyBytes = Files.readAllBytes(Paths.get(privateKeyFile.getPath()));
+        String base64String = FileUtils.readFileToString(privateKeyFile, StandardCharsets.UTF_8);
+        if (StringUtils.isEmpty(base64String))
+            return null;
+        base64String = base64String.trim();
+        base64String = base64String.replace("\r", "");
+        base64String = base64String.replace("\n", "");
+        byte[] keyBytes = Base64.getDecoder().decode(base64String);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         return keyFactory.generatePrivate(spec);
