@@ -47,12 +47,13 @@ public class RSAUtil {
      * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException
      */
-    public static byte[] encrypt(String data, PublicKey publicKey)
+    public static String encrypt(String data, PublicKey publicKey)
             throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException,
             NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        return cipher.doFinal(data.getBytes());
+        byte[] bytes = cipher.doFinal(data.getBytes());
+        return new String(bytes);
     }
 
     /**
@@ -67,12 +68,13 @@ public class RSAUtil {
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
      */
-    public static byte[] decrypt(String data, PrivateKey privateKey)
+    public static String decrypt(String data, PrivateKey privateKey)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return cipher.doFinal(data.getBytes());
+        byte[] bytes = cipher.doFinal(data.getBytes());
+        return new String(bytes);
     }
 
     /**
@@ -136,27 +138,4 @@ public class RSAUtil {
         return keyFactory.generatePrivate(spec);
     }
 
-    public static void main(String[] args) throws IllegalBlockSizeException,
-            InvalidKeyException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException {
-        KeyPair keyPair = RSAUtil.generateKeyPair();
-        if (keyPair == null)
-            return;
-        PublicKey publicKey = keyPair.getPublic();
-        PrivateKey privateKey = keyPair.getPrivate();
-        String message = "Hello World";
-
-        Base64.Encoder base64Encoder = Base64.getEncoder();
-
-        System.out.println("Public key:");
-        System.out.println(base64Encoder.encodeToString(publicKey.getEncoded()));
-        System.out.println("Private key:");
-        System.out.println(base64Encoder.encodeToString(privateKey.getEncoded()));
-        System.out.println("message: " + message);
-        byte[] encrypt = encrypt(message, publicKey);
-        System.out.println("encrypt: " + base64Encoder.encodeToString(encrypt));
-
-        byte[] decrypt = decrypt(new String(encrypt), privateKey);
-        System.out.println("decrypt: " + new String(decrypt));
-
-    }
 }

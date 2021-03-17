@@ -46,16 +46,16 @@ public class SecretKeyUtil {
             String value = config.get(String.class, key);
             if (value.startsWith(prefix)) {
                 value = value.replaceFirst(prefix, "");
-                byte[] decryptBytes;
+                String decrypt;
                 try {
-                    decryptBytes = RSAUtil.decrypt(value, privateKey);
+                    decrypt = RSAUtil.decrypt(value, privateKey);
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException
                         | InvalidKeyException | BadPaddingException
                         | IllegalBlockSizeException e) {
                     e.printStackTrace();
                     return;
                 }
-                config.setProperty(key, new String(decryptBytes));
+                config.setProperty(key, decrypt);
             }
         });
         try {
