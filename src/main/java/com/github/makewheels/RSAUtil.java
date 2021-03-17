@@ -36,6 +36,26 @@ public class RSAUtil {
     }
 
     /**
+     * 公钥转base64
+     *
+     * @param publicKey
+     * @return
+     */
+    public static String publicKeyToBase64(PublicKey publicKey) {
+        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
+    }
+
+    /**
+     * 私钥转base64
+     *
+     * @param privateKey
+     * @return
+     */
+    public static String privateKeyToBase64(PrivateKey privateKey) {
+        return Base64.getEncoder().encodeToString(privateKey.getEncoded());
+    }
+
+    /**
      * 加密
      *
      * @param data

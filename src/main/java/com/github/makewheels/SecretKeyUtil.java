@@ -93,6 +93,15 @@ public class SecretKeyUtil {
     }
 
     /**
+     * 获取存秘钥文件的根目录
+     *
+     * @return
+     */
+    public static File getKeyFolder() {
+        return new File(SystemUtils.getUserHome(), "keys");
+    }
+
+    /**
      * 加载本地私钥
      *
      * @return
@@ -102,9 +111,7 @@ public class SecretKeyUtil {
      */
     public static PrivateKey loadPrivateKey()
             throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        File folder = new File(SystemUtils.getUserHome(), "keys");
-        String filename = getApplicationName() + ".privateKey";
-        File keyFile = new File(folder, filename);
+        File keyFile = new File(getKeyFolder(),  getApplicationName() + ".privateKey");
         if (!keyFile.exists()) {
             log.info("secret key not exist: {}", keyFile.getPath());
             return null;
@@ -121,9 +128,7 @@ public class SecretKeyUtil {
      */
     public static PublicKey loadPublicKey()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        File folder = new File(SystemUtils.getUserHome(), "keys");
-        String filename = getApplicationName() + ".publicKey";
-        File keyFile = new File(folder, filename);
+        File keyFile = new File(getKeyFolder(), getApplicationName() + ".publicKey");
         if (!keyFile.exists()) {
             log.info("public key not exist: {}", keyFile.getPath());
             return null;
