@@ -36,23 +36,13 @@ public class RSAUtil {
     }
 
     /**
-     * 公钥转base64
+     * 秘钥转base64
      *
-     * @param publicKey
+     * @param key
      * @return
      */
-    public static String publicKeyToBase64(PublicKey publicKey) {
-        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
-    }
-
-    /**
-     * 私钥转base64
-     *
-     * @param privateKey
-     * @return
-     */
-    public static String privateKeyToBase64(PrivateKey privateKey) {
-        return Base64.getEncoder().encodeToString(privateKey.getEncoded());
+    public static String keyToBase64(Key key) {
+        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
     /**
@@ -156,6 +146,18 @@ public class RSAUtil {
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         return keyFactory.generatePrivate(spec);
+    }
+
+    /**
+     * 保存秘钥文件
+     *
+     * @param key
+     * @param keyFile
+     * @throws IOException
+     */
+    public static void saveKeyFile(Key key, File keyFile) throws IOException {
+        String base64 = keyToBase64(key);
+        FileUtils.writeStringToFile(keyFile, base64, StandardCharsets.UTF_8);
     }
 
 }

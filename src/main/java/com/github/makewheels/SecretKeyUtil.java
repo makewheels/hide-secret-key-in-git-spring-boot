@@ -26,6 +26,27 @@ import java.util.List;
  */
 @Slf4j
 public class SecretKeyUtil {
+    private static String applicationName;
+
+    /**
+     * 获取配置文件中的应用名
+     *
+     * @return
+     */
+    private static String getApplicationName() {
+        if (applicationName != null)
+            return applicationName;
+        PropertiesConfiguration config = new PropertiesConfiguration();
+        PropertiesConfigurationLayout layout = config.getLayout();
+        File propertiesFile = new File(SecretKeyUtil.class
+                .getResource("/application.properties").getPath());
+        try {
+            layout.load(config, new FileReader(propertiesFile));
+        } catch (ConfigurationException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return config.get(String.class, "spring.application.name");
+    }
 
     /**
      * 替换单个配置文件
@@ -33,15 +54,11 @@ public class SecretKeyUtil {
      * @param propertiesFile
      * @param privateKey
      */
-    private static void handleSingleFile(File propertiesFile, PrivateKey privateKey) {
+    private static void handleSingleFile(File propertiesFile, PrivateKey privateKey)
+            throws IOException, ConfigurationException {
         PropertiesConfiguration config = new PropertiesConfiguration();
         PropertiesConfigurationLayout layout = config.getLayout();
-        try {
-            layout.load(config, new FileReader(propertiesFile));
-        } catch (ConfigurationException | FileNotFoundException e) {
-            e.printStackTrace();
-            return;
-        }
+        layout.load(config, new FileReader(propertiesFile));
         List<String> keys = IteratorUtils.toList(config.getKeys());
         keys.stream().filter(key -> {
             if (StringUtils.isEmpty(key))
@@ -67,29 +84,7 @@ public class SecretKeyUtil {
             }
         });
         //最后保存文件
-        try {
-            layout.save(config, new FileWriter(propertiesFile, false));
-        } catch (ConfigurationException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 获取配置文件中的应用名
-     *
-     * @return
-     */
-    private static String getApplicationName() {
-        PropertiesConfiguration config = new PropertiesConfiguration();
-        PropertiesConfigurationLayout layout = config.getLayout();
-        File propertiesFile = new File(SecretKeyUtil.class
-                .getResource("/application.properties").getPath());
-        try {
-            layout.load(config, new FileReader(propertiesFile));
-        } catch (ConfigurationException | FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return config.get(String.class, "spring.application.name");
+        layout.save(config, new FileWriter(propertiesFile, false));
     }
 
     /**
@@ -99,6 +94,14 @@ public class SecretKeyUtil {
      */
     public static File getKeyFolder() {
         return new File(SystemUtils.getUserHome(), "keys");
+    }
+
+    private static File getPrivateKeyFile() {
+        return new File(getKeyFolder(), getApplicationName() + ".privateKey");
+    }
+
+    private static File getPublicKeyFile() {
+        return new File(getKeyFolder(), getApplicationName() + ".publicKey");
     }
 
     /**
@@ -111,7 +114,10 @@ public class SecretKeyUtil {
      */
     public static PrivateKey loadPrivateKey()
             throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        File keyFile = new File(getKeyFolder(),  getApplicationName() + ".privateKey");
+        String applicationName = getApplicationName();
+        if (StringUtils.isEmpty(applicationName))
+            return null;
+        File keyFile = getPrivateKeyFile();
         if (!keyFile.exists()) {
             log.info("secret key not exist: {}", keyFile.getPath());
             return null;
@@ -128,12 +134,51 @@ public class SecretKeyUtil {
      */
     public static PublicKey loadPublicKey()
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        File keyFile = new File(getKeyFolder(), getApplicationName() + ".publicKey");
+        String applicationName = getApplicationName();
+        if (StringUtils.isEmpty(applicationName))
+            return null;
+        File keyFile = new File(getKeyFolder(), applicationName + ".publicKey");
         if (!keyFile.exists()) {
             log.info("public key not exist: {}", keyFile.getPath());
             return null;
         }
         return RSAUtil.loadPublicKey(keyFile);
+    }
+
+    /**
+     * 保存公钥到本地
+     *
+     * @param publicKey
+     */
+    public static void savePublicKey(PublicKey publicKey) {
+        File publicKeyFile = getPublicKeyFile();
+        if (publicKeyFile.exists())
+            log.warn("public key file already exist, will over write it, key file path:\n{}",
+                    publicKeyFile.getPath());
+        try {
+            RSAUtil.saveKeyFile(publicKey, publicKeyFile);
+            log.info("save new public key file: {}", publicKeyFile.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 保存私钥到本地
+     *
+     * @param privateKey
+     */
+    public static void savePrivateKey(PrivateKey privateKey) {
+        File privateKeyFile = getPrivateKeyFile();
+        if (privateKeyFile.exists())
+            log.warn("private key file already exist, will over write it, key file path:\n{}",
+                    privateKeyFile.getPath());
+        try {
+            RSAUtil.saveKeyFile(privateKey, privateKeyFile);
+            log.info("save new private key file: {}", privateKeyFile.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -164,6 +209,12 @@ public class SecretKeyUtil {
             if (StringUtils.isEmpty(fileName))
                 return false;
             return fileName.startsWith("application") && fileName.endsWith(".properties");
-        }).forEach(file -> handleSingleFile(file, privateKey));
+        }).forEach(file -> {
+            try {
+                handleSingleFile(file, privateKey);
+            } catch (IOException | ConfigurationException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
