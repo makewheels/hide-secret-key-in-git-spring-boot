@@ -15,6 +15,7 @@ import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.List;
@@ -41,13 +42,13 @@ public class SecretKeyUtil {
             String value = config.get(String.class, key);
             return StringUtils.isNotEmpty(value);
         }).forEach(key -> {
-            String prefix = "CIPHER";
+            String prefix = "CIPHER ";
             String value = config.get(String.class, key);
             if (value.startsWith(prefix)) {
                 value = value.replaceFirst(prefix, "");
                 byte[] decryptBytes;
                 try {
-                    decryptBytes = RSAUtil.decrypt(value.getBytes(), privateKey);
+                    decryptBytes = RSAUtil.decrypt(value, privateKey);
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException
                         | InvalidKeyException | BadPaddingException
                         | IllegalBlockSizeException e) {
@@ -77,16 +78,28 @@ public class SecretKeyUtil {
         return config.get(String.class, "spring.application.name");
     }
 
-    private static PrivateKey loadPrivateKey()
+    public static PrivateKey loadPrivateKey()
             throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         File folder = new File(SystemUtils.getUserHome(), "keys");
         String filename = getApplicationName() + ".privateKey";
-        File privateKeyFile = new File(folder, filename);
-        if (!privateKeyFile.exists()) {
-            log.info("secret key not exist: {}", privateKeyFile.getPath());
+        File keyFile = new File(folder, filename);
+        if (!keyFile.exists()) {
+            log.info("secret key not exist: {}", keyFile.getPath());
             return null;
         }
-        return RSAUtil.loadPrivateKey(privateKeyFile);
+        return RSAUtil.loadPrivateKey(keyFile);
+    }
+
+    public static PublicKey loadPublicKey()
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        File folder = new File(SystemUtils.getUserHome(), "keys");
+        String filename = getApplicationName() + ".publicKey";
+        File keyFile = new File(folder, filename);
+        if (!keyFile.exists()) {
+            log.info("public key not exist: {}", keyFile.getPath());
+            return null;
+        }
+        return RSAUtil.loadPublicKey(keyFile);
     }
 
     public static void overrideKeys() {
