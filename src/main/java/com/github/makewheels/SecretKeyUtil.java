@@ -1,5 +1,6 @@
 package com.github.makewheels;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.PropertiesConfigurationLayout;
@@ -22,6 +23,7 @@ import java.util.List;
  * @Author makewheels
  * @Time 2021.03.16 22:01:00
  */
+@Slf4j
 public class SecretKeyUtil {
     private static void handleSingleFile(File propertiesFile, PrivateKey privateKey) {
         PropertiesConfiguration config = new PropertiesConfiguration();
@@ -80,8 +82,10 @@ public class SecretKeyUtil {
         File folder = new File(SystemUtils.getUserHome(), "keys");
         String filename = getApplicationName() + ".privateKey";
         File privateKeyFile = new File(folder, filename);
-        if (!privateKeyFile.exists())
+        if (!privateKeyFile.exists()) {
+            log.info("secret key not exist: {}", privateKeyFile.getPath());
             return null;
+        }
         return RSAUtil.loadPrivateKey(privateKeyFile);
     }
 
