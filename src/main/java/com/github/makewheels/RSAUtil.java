@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class RSAUtil {
@@ -63,7 +64,7 @@ public class RSAUtil {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] bytes = cipher.doFinal(data.getBytes());
-        return new String(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     /**
@@ -83,8 +84,7 @@ public class RSAUtil {
             BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] bytes = cipher.doFinal(data.getBytes());
-        return new String(bytes);
+        return new String(cipher.doFinal(Base64.getDecoder().decode(data)));
     }
 
     /**
@@ -124,7 +124,7 @@ public class RSAUtil {
         if (StringUtils.isEmpty(base64String))
             return null;
         byte[] keyBytes = Base64.getDecoder().decode(base64String);
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         return keyFactory.generatePublic(spec);
     }

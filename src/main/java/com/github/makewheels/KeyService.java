@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
 @Service
@@ -62,6 +59,19 @@ public class KeyService {
     }
 
     public String decrypt(String data) {
-        return null;
+        PrivateKey privateKey;
+        try {
+            privateKey = SecretKeyUtil.loadPrivateKey();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        try {
+            return RSAUtil.decrypt(data, privateKey);
+        } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException
+                | NoSuchPaddingException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
     }
 }

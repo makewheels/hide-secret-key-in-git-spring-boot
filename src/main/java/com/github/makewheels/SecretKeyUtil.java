@@ -109,11 +109,10 @@ public class SecretKeyUtil {
      *
      * @return
      * @throws NoSuchAlgorithmException
-     * @throws IOException
      * @throws InvalidKeySpecException
      */
     public static PrivateKey loadPrivateKey()
-            throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         String applicationName = getApplicationName();
         if (StringUtils.isEmpty(applicationName))
             return null;
@@ -196,7 +195,7 @@ public class SecretKeyUtil {
         PrivateKey privateKey;
         try {
             privateKey = loadPrivateKey();
-        } catch (NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
             return;
         }

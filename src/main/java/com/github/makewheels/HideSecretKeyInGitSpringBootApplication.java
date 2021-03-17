@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class HideSecretKeyInGitSpringBootApplication {
 
     public static void main(String[] args) {
-//        SecretKeyUtil.overrideKeys();
+        SecretKeyUtil.overrideKeys();
 
         SpringApplication.run(HideSecretKeyInGitSpringBootApplication.class, args);
     }
