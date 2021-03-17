@@ -1,11 +1,20 @@
 package com.github.makewheels;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 @Service
+@Slf4j
 public class KeyService {
     @Value("${spring.application.name}")
     private String applicationName;
@@ -35,5 +44,24 @@ public class KeyService {
         return convertKeyPairToPublicPrivateKey(keyPair);
     }
 
+    public String encrypt(String data) {
+        PublicKey publicKey;
+        try {
+            publicKey = SecretKeyUtil.loadPublicKey();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        try {
+            return RSAUtil.encrypt(data, publicKey);
+        } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException
+                | NoSuchPaddingException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
 
+    public String decrypt(String data) {
+        return null;
+    }
 }

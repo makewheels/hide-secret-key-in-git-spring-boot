@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -26,4 +27,15 @@ public class KeyController {
         return JSON.toJSONString(keyService.generateKeyPairAndSave());
     }
 
+    @GetMapping("encrypt")
+    @ApiOperation(value = "加密")
+    public String encrypt(@RequestParam String data) {
+        return JSON.toJSONString(keyService.encrypt(data));
+    }
+
+    @GetMapping("decrypt")
+    @ApiOperation(value = "解密")
+    public String decrypt(@RequestParam String data) {
+        return JSON.toJSONString(keyService.decrypt(data));
+    }
 }

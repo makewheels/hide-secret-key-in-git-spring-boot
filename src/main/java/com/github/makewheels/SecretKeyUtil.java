@@ -152,9 +152,10 @@ public class SecretKeyUtil {
      */
     public static void savePublicKey(PublicKey publicKey) {
         File publicKeyFile = getPublicKeyFile();
-        if (publicKeyFile.exists())
-            log.warn("public key file already exist, will over write it, key file path:\n{}",
-                    publicKeyFile.getPath());
+        if (publicKeyFile.exists()) {
+            log.warn("public key file already exist, will over write it, key file path:");
+            log.warn(publicKeyFile.getPath());
+        }
         try {
             RSAUtil.saveKeyFile(publicKey, publicKeyFile);
             log.info("save new public key file: {}", publicKeyFile.getPath());
@@ -170,9 +171,10 @@ public class SecretKeyUtil {
      */
     public static void savePrivateKey(PrivateKey privateKey) {
         File privateKeyFile = getPrivateKeyFile();
-        if (privateKeyFile.exists())
-            log.warn("private key file already exist, will over write it, key file path:\n{}",
-                    privateKeyFile.getPath());
+        if (privateKeyFile.exists()) {
+            log.warn("private key file already exist, will over write it, key file path:");
+            log.warn(privateKeyFile.getPath());
+        }
         try {
             RSAUtil.saveKeyFile(privateKey, privateKeyFile);
             log.info("save new private key file: {}", privateKeyFile.getPath());
