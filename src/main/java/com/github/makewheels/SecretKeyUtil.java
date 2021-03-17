@@ -12,10 +12,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +53,7 @@ public class SecretKeyUtil {
      */
     private static void handleSingleFile(File propertiesFile, PrivateKey privateKey)
             throws IOException, ConfigurationException {
+        log.info("key replace file: {}", propertiesFile.getName());
         PropertiesConfiguration config = new PropertiesConfiguration();
         PropertiesConfigurationLayout layout = config.getLayout();
         layout.load(config, new FileReader(propertiesFile));
@@ -80,6 +78,7 @@ public class SecretKeyUtil {
                     e.printStackTrace();
                     return;
                 }
+                log.info("replace key: {}", key);
                 config.setProperty(key, decrypt);
             }
         });
