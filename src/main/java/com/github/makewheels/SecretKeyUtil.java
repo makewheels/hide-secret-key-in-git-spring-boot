@@ -65,7 +65,7 @@ public class SecretKeyUtil {
             return StringUtils.isNotEmpty(value);
         }).forEach(key -> {
             //找到加密字段，解密替换
-            String prefix = "CIPHER";
+            String prefix = "[$]CIPHER[$]";
             String value = config.get(String.class, key);
             if (value.startsWith(prefix)) {
                 value = value.replaceFirst(prefix, "");
