@@ -1,5 +1,7 @@
 package com.github.makewheels;
 
+import com.github.makewheels.hideyourkeys.RSAUtil;
+import com.github.makewheels.hideyourkeys.SecretKeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
